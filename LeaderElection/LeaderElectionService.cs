@@ -14,7 +14,7 @@ namespace LeaderElection
         readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private RedLockFactory _distributedLockFactory;
         private const string _resource = "the-thing-we-are-locking-on";
-        private const int _expirySecondsCount = 5;
+        private const int _expirySecondsCount = 3;
         private readonly TimeSpan _expiry = TimeSpan.FromSeconds(_expirySecondsCount);
 
         public void Start()
