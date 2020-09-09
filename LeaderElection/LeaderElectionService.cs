@@ -14,7 +14,7 @@ namespace LeaderElection
         readonly CancellationTokenSource _cts = new CancellationTokenSource();
         private RedLockFactory _distributedLockFactory;
         private const string _resource = "the-thing-we-are-locking-on";
-        private const int _expirySecondsCount = 3;
+        private const int _expirySecondsCount = 5;
         private readonly TimeSpan _expiry = TimeSpan.FromSeconds(_expirySecondsCount);
 
         public void Start()
@@ -22,8 +22,6 @@ namespace LeaderElection
             var endPoints = new List<RedLockEndPoint>
             {
                 new DnsEndPoint("localhost", 6379)
-               
-                //todo add more redis
             };
             _distributedLockFactory = RedLockFactory.Create(endPoints);
             _acquireLockTimer = new Timer(async state => await TryAcquireLock((CancellationToken)state), _cts.Token, 0, _expirySecondsCount * 1000);
@@ -48,12 +46,14 @@ namespace LeaderElection
 
         private static void DoSlaveJob()
         {
-            Console.WriteLine("slave job running");
+            Console.WriteLine("waiting for leader position");
         }
 
         private static void DoLeaderJob()
         {
-            Console.WriteLine("Leader Job Running");
+            Console.WriteLine("Leader sending heartbeat");
+            Client client = new Client();
+            client.ExecuteClient();
         }
     }
 }
