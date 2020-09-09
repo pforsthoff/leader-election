@@ -50,34 +50,32 @@ namespace Server
                     // Accept() method the server  
                     // will accept connection of client 
                     Socket clientSocket = listener.Accept();
-                    while (clientSocket.Connected)
+                    
+                    // Data buffer 
+                    byte[] bytes = new Byte[1024];
+                    string data = null;
+
+                    while (true)
                     {
-                        // Data buffer 
-                        byte[] bytes = new Byte[1024];
-                        string data = null;
+                        int numByte = clientSocket.Receive(bytes);
+                        data += Encoding.ASCII.GetString(bytes,
+                            0, numByte);
 
-                        while (true)
-                        {
-                            int numByte = clientSocket.Receive(bytes);
-                            data += Encoding.ASCII.GetString(bytes,
-                                0, numByte);
-
-                            if (data.IndexOf("<EOF>") > -1)
-                                break;
-                        }
-
-                        Console.WriteLine("Text received -> {0} ", data);
-                        byte[] message = Encoding.ASCII.GetBytes("Test Server");
-
-                        // Send a message to Client  
-                        // using Send() method 
-                        clientSocket.Send(message);
-
-                        // Close client Socket using the 
-                        // Close() method. After closing, 
-                        // we can use the closed Socket  
-                        // for a new Client Connection 
+                        if (data.IndexOf("<EOF>") > -1)
+                            break;
                     }
+
+                    Console.WriteLine("Text received -> {0} ", data);
+                    byte[] message = Encoding.ASCII.GetBytes("Test Server");
+
+                    // Send a message to Client  
+                    // using Send() method 
+                    clientSocket.Send(message);
+
+                    // Close client Socket using the 
+                    // Close() method. After closing, 
+                    // we can use the closed Socket  
+                    // for a new Client Connection 
 
                     clientSocket.Shutdown(SocketShutdown.Both);
                     clientSocket.Close();
